@@ -1,5 +1,7 @@
 # Comandos MySQL
 
+## Aula 01
+
 ### Criando um banco de dados:
 CREATE DATABASE sistema_vendas;
 
@@ -66,3 +68,103 @@ DROP TABLE clientes;
 
 ### Deletando o banco:
 DROP DATABASE sistema_vendas;
+
+
+## Aula 02
+
+### Já visto anteriormente:
+CREATE DATABASE IF NOT EXISTS LojaVirtual;
+
+USE LojaVirtual;
+
+CREATE TABLE clientes(
+	id_cliente INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    cidade VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE pedidos(
+	id_pedido INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    CONSTRAINT fk_pedidos_clientes FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);
+
+INSERT INTO clientes (nome, cidade) VALUES 
+('Ana', 'Rio de Janeiro'), 
+('Pedro', 'Itaperuna'),
+('Matheus', 'Campos'),
+('Gabriel', 'Italva');
+
+INSERT INTO clientes (nome, cidade) VALUES ('Adalberto', 'São Fidelis');
+
+INSERT INTO pedidos (id_cliente, valor) VALUES 
+(1, 100.00), 
+(4, 230.80),
+(2, 122.75),
+(3, 89.00);
+
+INSERT INTO pedidos (id_cliente, valor) VALUES (NULL, 100.00);
+
+### FUNÇÕES DE AGREGAÇÃO
+SELECT 
+	SUM(valor) AS soma_total, 
+    AVG(valor) AS media_valores,
+    MAX(valor) AS valor_maximo,
+    MIN(valor) AS valor_minimo,
+    COUNT(*) AS pedidos_totais
+FROM pedidos;
+
+### AGRUPAMENTO E FILTROS
+SELECT
+	id_cliente,
+    SUM(valor) AS total_gasto
+FROM pedidos 
+WHERE id_cliente IS NOT NULL
+GROUP BY id_cliente;
+
+SELECT
+	id_cliente,
+    SUM(valor) AS total_gasto
+FROM pedidos
+GROUP BY id_cliente
+HAVING SUM(valor) > 120.00;
+
+### JUNÇÕES DE TABELAS (JOIN)
+SELECT
+	clientes.nome,
+    pedidos.id_pedido,
+    pedidos.valor
+FROM clientes INNER JOIN pedidos ON clientes.id_cliente = pedidos.id_cliente ORDER BY valor DESC;
+
+
+SELECT
+	clientes.nome,
+    pedidos.id_pedido,
+    pedidos.valor
+FROM clientes LEFT JOIN pedidos ON clientes.id_cliente = pedidos.id_cliente;
+
+SELECT
+	clientes.nome,
+    pedidos.id_pedido,
+    pedidos.valor
+FROM clientes RIGHT JOIN pedidos ON clientes.id_cliente = pedidos.id_cliente;
+
+SELECT
+	clientes.nome,
+    pedidos.id_pedido,
+    pedidos.valor
+FROM clientes 
+LEFT JOIN pedidos ON clientes.id_cliente = pedidos.id_cliente
+UNION
+SELECT
+	clientes.nome,
+    pedidos.id_pedido,
+    pedidos.valor
+FROM clientes 
+RIGHT JOIN pedidos ON clientes.id_cliente = pedidos.id_cliente;
+
+DROP TABLE IF EXISTS pedidos;
+DROP TABLE IF EXISTS clientes;
+DROP DATABASE IF EXISTS lojavirtual;
+
